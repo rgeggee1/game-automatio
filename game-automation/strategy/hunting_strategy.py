@@ -1,65 +1,44 @@
 """
-窗口管理器 - 获取游戏窗口句柄和信息
+打怪策略 - 整合检测和动作
 """
-import ctypes
-from ctypes import wintypes
+import time
+from detection.monster_detector import MonsterDetector
+from actions.combat import CombatActions
+from actions.looting import LootingActions
 
-user32 = ctypes.windll.user32
-
-class WindowManager:
-    """游戏窗口管理器"""
+class HuntingStrategy:
+    """打怪策略控制器"""
     
-    @staticmethod
-    def get_window_by_title(title_keyword):
-        """
-        根据标题关键词查找窗口
-        :param title_keyword: 窗口标题关键词
-        :return: 窗口句柄（hwnd）
-        """
-        hwnd = user32.FindWindowW(None, title_keyword)
-        if hwnd == 0:
-            # 尝试枚举所有窗口查找
-            hwnd = WindowManager._enum_windows_by_title(title_keyword)
-        return hwnd
-    
-    @staticmethod
-    def _enum_windows_by_title(title_keyword):
-        """枚举所有窗口查找匹配标题"""
-        result = {'hwnd': 0}
+    def __init__(self, screen_capture, input_controller):
+        self.screen_capture = screen_capture
+        self.input_ctrl = input_controller
         
-        def callback(hwnd, lparam):
-            length = user32.GetWindowTextLengthW(hwnd)
-            if length > 0:
-                buff = ctypes.create_unicode_buffer(length + 1)
-                user32.GetWindowTextW(hwnd, buff, length + 1)
-                if title_keyword. lower() in buff.value.lower():
-                    result['hwnd'] = hwnd
-                    return False  # 停止枚举
-            return True
+        # 初始化各模块
+        self.monster_detector = MonsterDetector()
+        self.combat = CombatActions(input_controller)
+        self.looting = LootingActions(input_controller)
         
-        WNDENUMPROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
-        user32.EnumWindows(WNDENUMPROC(callback), 0)
-        return result['hwnd']
-    
-    @staticmethod
-    def get_window_rect(hwnd):
+        # 配int, int, int, int]):
         """
-        获取窗口位置和大小
-        :return: (x, y, width, height)
+        拾取尸体
+        :param corpse_pos: 尸体位置 (x, y, w, h)
         """
-        rect = wintypes.RECT()
-        user32.GetWindowRect(hwnd, ctypes.byref(rect))
-        return (rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top)
+        x, y, w, h = corpse_pos
+        center_x = x + w // 2
+        center_y = y + h // 2
+        
+        print(f"  💰 点击尸体: ({center_x}, {center_y})")
+        self.input.click_input(center_x, center_y, restore_cursor=True)
+        time.sleep(0.3)
+        
+        print(f"  💰 按F键拾取...")
+        self.input.send_key(self.loot_key)
+        time.sleep(0.5)
     
-    @staticmethod
-    def get_window_title(hwnd):
-        """获取窗口标题"""
-        length = user32.GetWindowTextLengthW(hwnd)
-        buff = ctypes.create_unicode_buffer(length + 1)
-        user32.GetWindowTextW(hwnd, buff, length + 1)
-        return buff. value
-    
-    @staticmethod
-    def activate_window(hwnd):
-        """激活窗口（置于前台）"""
-        user32.SetForegroundWindow(hwnd)
+    def auto_loot_nearby(self, positions: list):
+        """
+        自动拾取多个位置的物品
+        """
+        for pos in positions:
+            self. loot_corpse(pos)
+            time.sleep(0.2)

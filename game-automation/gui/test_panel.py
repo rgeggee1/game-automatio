@@ -1,5 +1,5 @@
 """
-测试面板 - 精简版（添加调试功能和数字键测试）
+测试面板 - 精简版（移除调试按钮，添加增强截图）
 """
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
                               QPushButton, QLabel, QSpinBox, QCheckBox)
@@ -33,7 +33,7 @@ class TestPanel(QWidget):
         self.checkbox_restore_cursor.setChecked(True)
         self.checkbox_restore_cursor.setStyleSheet("color: #0066cc; font-weight: bold;")
         background_layout.addWidget(self.checkbox_restore_cursor)
-        background_layout. addStretch()
+        background_layout.addStretch()
         mouse_layout.addLayout(background_layout)
         
         # 坐标输入
@@ -54,13 +54,13 @@ class TestPanel(QWidget):
         btn_get_pos.clicked. connect(self.get_current_mouse_pos)
         coord_layout.addWidget(btn_get_pos)
         
-        mouse_layout. addLayout(coord_layout)
+        mouse_layout.addLayout(coord_layout)
         
         # 鼠标按钮
         mouse_btn_layout = QHBoxLayout()
         
         btn_move = QPushButton("移动鼠标")
-        btn_move.clicked.connect(self.test_mouse_move)
+        btn_move.clicked.connect(self. test_mouse_move)
         mouse_btn_layout.addWidget(btn_move)
         
         btn_left_click = QPushButton("左键点击")
@@ -85,26 +85,6 @@ class TestPanel(QWidget):
         # ========== 键盘测试组 ==========
         keyboard_group = QGroupBox("⌨️ 键盘控制测试")
         keyboard_layout = QVBoxLayout()
-        
-        # 调试按钮（新增数字键测试）
-        debug_layout = QHBoxLayout()
-        
-        btn_test_f1 = QPushButton("🧪 测试所有方式 (F1)")
-        btn_test_f1.clicked.connect(lambda: self.test_all_methods(0x70, "F1"))
-        btn_test_f1.setStyleSheet("background-color: #FF5722; color: white; font-weight: bold;")
-        debug_layout.addWidget(btn_test_f1)
-        
-        btn_test_1 = QPushButton("🧪 测试所有方式 (数字1)")
-        btn_test_1.clicked. connect(lambda: self.test_all_methods(0x31, "1"))
-        btn_test_1.setStyleSheet("background-color: #FF5722; color:  white; font-weight: bold;")
-        debug_layout.addWidget(btn_test_1)
-        
-        btn_activate_window = QPushButton("📌 先激活窗口")
-        btn_activate_window. clicked.connect(self.activate_window)
-        debug_layout.addWidget(btn_activate_window)
-        
-        debug_layout.addStretch()
-        keyboard_layout.addLayout(debug_layout)
         
         # 功能按键 F1-F4
         func_label = QLabel("⚡ 技能按键 (F1-F4):")
@@ -143,13 +123,13 @@ class TestPanel(QWidget):
             btn.setMinimumWidth(70)
             btn.setMinimumHeight(40)
             btn.setStyleSheet("background-color: #2196F3; color: white; font-weight: bold; font-size: 14px;")
-            btn.clicked.connect(lambda checked, vk=vk_code, name=key_name:  self.send_key(vk, name))
+            btn.clicked. connect(lambda checked, vk=vk_code, name=key_name: self.send_key(vk, name))
             num_key_layout.addWidget(btn)
         
         num_key_layout.addStretch()
         keyboard_layout.addLayout(num_key_layout)
         
-        # 字母按键 M
+        # 字母按键 M 和 F
         other_label = QLabel("🔧 其他按键:")
         other_label.setStyleSheet("font-weight: bold; padding-top: 10px;")
         keyboard_layout.addWidget(other_label)
@@ -160,13 +140,20 @@ class TestPanel(QWidget):
         btn_m.setMinimumWidth(80)
         btn_m.setMinimumHeight(40)
         btn_m.setStyleSheet("background-color: #9C27B0; color: white; font-weight: bold; font-size: 14px;")
-        btn_m.clicked. connect(lambda: self.send_key(0x4D, "M"))
+        btn_m.clicked. connect(lambda:  self.send_key(0x4D, "M"))
         other_key_layout.addWidget(btn_m)
+        
+        btn_f = QPushButton("F (拾取)")
+        btn_f.setMinimumWidth(80)
+        btn_f.setMinimumHeight(40)
+        btn_f.setStyleSheet("background-color: #FF5722; color: white; font-weight: bold; font-size:  14px;")
+        btn_f.clicked.connect(lambda: self.send_key(0x46, "F"))
+        other_key_layout.addWidget(btn_f)
         
         other_key_layout.addStretch()
         keyboard_layout.addLayout(other_key_layout)
         
-        key_hint = QLabel("💡 提示：使用 SendMessageW 窗口消息直投，绕过反外挂硬件层检测")
+        key_hint = QLabel("💡 提示：F1-F4 使用 SendMessageW 到子窗口，数字键使用 PostMessageW 到子窗口")
         key_hint.setStyleSheet("color: #0066cc; font-size: 10px; padding: 5px; font-weight: bold;")
         keyboard_layout.addWidget(key_hint)
         
@@ -177,15 +164,20 @@ class TestPanel(QWidget):
         screenshot_group = QGroupBox("📸 截图测试")
         screenshot_layout = QVBoxLayout()
         
-        btn_screenshot = QPushButton("📷 截取游戏画面")
+        btn_screenshot = QPushButton("📷 截取游戏画面 (DirectX兼容)")
         btn_screenshot.clicked.connect(self.test_screenshot)
+        btn_screenshot.setStyleSheet("background-color: #673AB7; color: white; font-weight: bold; padding: 10px;")
         screenshot_layout.addWidget(btn_screenshot)
         
         self.screenshot_label = QLabel("截图将保存到：screenshot.png")
         self.screenshot_label.setStyleSheet("padding: 5px; color: #666;")
         screenshot_layout.addWidget(self.screenshot_label)
         
-        screenshot_group. setLayout(screenshot_layout)
+        screenshot_hint = QLabel("💡 自动尝试 PrintWindow、BitBlt、屏幕截取三种方法")
+        screenshot_hint.setStyleSheet("color: #666; font-size: 10px; padding: 5px;")
+        screenshot_layout.addWidget(screenshot_hint)
+        
+        screenshot_group.setLayout(screenshot_layout)
         layout.addWidget(screenshot_group)
         
         # 状态提示
@@ -204,34 +196,7 @@ class TestPanel(QWidget):
         else:
             self.input_controller = None
             self.test_status.setText("请先选择游戏窗口后再进行测试")
-            self.test_status. setStyleSheet("color: red; padding: 10px; font-weight: bold;")
-    
-    def test_all_methods(self, vk_code, key_name):
-        """测试所有发送方式"""
-        if not self.input_controller:
-            self.show_error("请先选择游戏窗口！")
-            return
-        
-        self.test_status.setText(f"🧪 正在测试 {key_name} 的所有发送方式，请查看控制台输出和游戏反应...")
-        self.test_status. setStyleSheet("color: orange; padding: 10px; font-weight: bold;")
-        
-        # 测试指定按键
-        self.input_controller.send_key_all_methods(vk_code)
-        
-        self.test_status. setText(f"✅ {key_name} 测试完成！请观察游戏哪个方法触发了按键")
-        self.test_status.setStyleSheet("color: blue; padding: 10px; font-weight: bold;")
-    
-    def activate_window(self):
-        """激活游戏窗口"""
-        if not self.window_manager.current_hwnd:
-            self.show_error("请先选择游戏窗口！")
-            return
-        
-        import ctypes
-        user32 = ctypes.windll.user32
-        user32.SetForegroundWindow(self.window_manager.current_hwnd)
-        self.test_status. setText("✅ 已激活游戏窗口")
-        self.test_status.setStyleSheet("color: blue; padding: 10px; font-weight: bold;")
+            self.test_status.setStyleSheet("color: red; padding:  10px; font-weight:  bold;")
     
     def get_current_mouse_pos(self):
         """获取当前鼠标位置（客户区坐标）"""
@@ -240,7 +205,7 @@ class TestPanel(QWidget):
         
         pos = win32api.GetCursorPos()
         
-        if self.window_manager.current_hwnd:
+        if self.window_manager. current_hwnd:
             # 转换为客户区坐标
             client_pos = win32gui. ScreenToClient(self.window_manager.current_hwnd, pos)
             self.mouse_x. setValue(client_pos[0])
@@ -249,7 +214,7 @@ class TestPanel(QWidget):
         else:
             self.test_status.setText("❌ 请先选择游戏窗口")
         
-        self.test_status. setStyleSheet("color: blue; padding: 10px; font-weight: bold;")
+        self.test_status.setStyleSheet("color: blue; padding: 10px; font-weight: bold;")
     
     def test_mouse_move(self):
         """测试鼠标移动"""
@@ -282,7 +247,7 @@ class TestPanel(QWidget):
         
         status_text = f"✅ 已在客户区坐标 ({x}, {y}) 左键点击"
         if restore_cursor:
-            status_text += " 🎯后台"
+            status_text += " 🎯 (后台模式)"
         
         self.test_status.setText(status_text)
         self.test_status.setStyleSheet("color: blue; padding: 10px; font-weight: bold;")
@@ -302,38 +267,59 @@ class TestPanel(QWidget):
         
         status_text = f"✅ 已在客户区坐标 ({x}, {y}) 右键点击"
         if restore_cursor:
-            status_text += " 🎯后台"
+            status_text += " 🎯 (后台模式)"
         
-        self. test_status.setText(status_text)
-        self.test_status.setStyleSheet("color: blue; padding: 10px; font-weight: bold;")
+        self.test_status. setText(status_text)
+        self.test_status.setStyleSheet("color: blue; padding:  10px; font-weight:  bold;")
     
     def send_key(self, vk_code, key_name):
         """发送按键"""
-        if not self. input_controller:
-            self. show_error("请先选择游戏窗口！")
+        if not self.input_controller:
+            self.show_error("请先选择游戏窗口！")
             return
         
         # 使用窗口消息直投方式
         self.input_controller.send_key(vk_code)
         
-        self.test_status.setText(f"✅ 已发送按键:  {key_name} (VK:  0x{vk_code: 02X}) [SendMessageW 直投]")
+        self.test_status.setText(f"✅ 已发送按键:  {key_name} (VK:  0x{vk_code: 02X})")
         self.test_status.setStyleSheet("color: blue; padding: 10px; font-weight: bold;")
     
     def test_screenshot(self):
-        """测试截图"""
-        if not self. window_manager.current_hwnd:
+        """测试截图（增强版 - 支持DirectX游戏）"""
+        if not self.window_manager.current_hwnd:
             self.show_error("请先选择游戏窗口！")
             return
         
-        from core.screen_capture import ScreenCapture
-        
         try:
-            capturer = ScreenCapture(self.window_manager.current_hwnd)
-            filename = "screenshot. png"
-            capturer.save_screenshot(filename)
-            self.screenshot_label.setText(f"✅ 截图已保存到：{filename}")
-            self.screenshot_label.setStyleSheet("padding: 5px; color: green;")
+            self.test_status.setText("📸 正在截图（DirectX兼容模式）...")
+            self.test_status.setStyleSheet("color: orange; padding: 10px; font-weight: bold;")
+            
+            # 使用增强版截图
+            from core.screen_capture_advanced import ScreenCaptureAdvanced
+            
+            capturer = ScreenCaptureAdvanced(self.window_manager. current_hwnd)
+            filename = "screenshot.png"
+            
+            print("\n" + "="*60)
+            print("🎮 开始截取游戏画面...")
+            print("="*60)
+            
+            result = capturer.save_screenshot(filename)
+            
+            import os
+            if os.path. exists(filename):
+                file_size = os.path.getsize(filename)
+                self. screenshot_label.setText(f"✅ 截图已保存: {filename} ({file_size/1024:.1f} KB)")
+                self.screenshot_label.setStyleSheet("padding: 5px; color: green; font-weight: bold;")
+                
+                self.test_status.setText(f"✅ 截图成功！请查看 {filename}")
+                self.test_status.setStyleSheet("color: green; padding:  10px; font-weight:  bold;")
+            else:
+                self.show_error("截图文件未生成！")
+            
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             self.show_error(f"截图失败：{str(e)}")
     
     def show_error(self, message):
