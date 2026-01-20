@@ -1,0 +1,22 @@
+# 游戏配置
+game:
+  window_title: "游戏窗口标题关键词"
+  
+# 按键映射
+keys:
+  attack: 0x31      # VK_1
+  skill1: 0x32      # VK_2
+  pickup: 0x46      # VK_F
+  move_forward: 0x57  # VK_W
+
+# 检测配置
+detection:
+  monster_color_range: [100, 150, 200]  # RGB颜色范围
+  inventory_full_check_interval: 5      # 包裹检测间隔（秒）
+
+# 打怪点位置
+hunting_spots:
+  - name: "地点1"
+    coordinates: [100, 200]
+  - name: "地点2"
+    coordinates: [300, 400]
