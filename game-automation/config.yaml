@@ -11,8 +11,18 @@ keys:
 
 # 检测配置
 detection:
-  monster_color_range: [100, 150, 200]  # RGB颜色范围
-  inventory_full_check_interval: 5      # 包裹检测间隔（秒）
+  # 怪物检测 - HSV颜色范围
+  monster_detection:
+    use_hsv: true                           # 使用HSV色彩空间
+    # 红色检测范围（HSV）
+    red_lower1: [0, 50, 50]                 # 红色范围1 [H, S, V]
+    red_upper1: [10, 255, 255]
+    red_lower2: [160, 50, 50]               # 红色范围2
+    red_upper2: [180, 255, 255]
+    min_area: 50                            # 最小怪物面积（像素）
+    max_area: 15000                         # 最大怪物面积（像素）
+  
+  inventory_full_check_interval: 5          # 包裹检测间隔（秒）
 
 # 打怪点位置
 hunting_spots:

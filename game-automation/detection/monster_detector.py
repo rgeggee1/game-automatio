@@ -16,23 +16,25 @@ class MonsterDetector:
         """
         self.config = config or {}
         
-        # 默认检测参数 - 红色系怪物（常见的敌对单位标识色）
-        # 使用HSV色彩空间进行检测，更加稳定
-        self.use_hsv = True
+        # 从配置加载参数，使用默认值作为后备
+        monster_cfg = self.config.get('monster_detection', {})
+        
+        # 是否使用HSV色彩空间
+        self.use_hsv = monster_cfg.get('use_hsv', True)
         
         # HSV颜色范围（红色） - 调整为更宽松的范围
-        self.red_lower1 = np.array([0, 50, 50])        # 红色范围1（降低饱和度和明度阈值）
-        self.red_upper1 = np.array([10, 255, 255])
-        self.red_lower2 = np.array([160, 50, 50])      # 红色范围2
-        self.red_upper2 = np.array([180, 255, 255])
+        self.red_lower1 = np.array(monster_cfg.get('red_lower1', [0, 50, 50]))
+        self.red_upper1 = np.array(monster_cfg.get('red_upper1', [10, 255, 255]))
+        self.red_lower2 = np.array(monster_cfg.get('red_lower2', [160, 50, 50]))
+        self.red_upper2 = np.array(monster_cfg.get('red_upper2', [180, 255, 255]))
         
         # BGR颜色范围（备选）
         self.monster_color_lower = np.array([0, 0, 150])    # BGR格式: 蓝色通道低
         self.monster_color_upper = np.array([100, 100, 255])  # BGR格式: 红色通道高
         
         # 检测阈值
-        self.min_monster_area = 50   # 最小怪物面积（像素）- 降低以检测较小目标
-        self.max_monster_area = 15000  # 最大怪物面积（像素）
+        self.min_monster_area = monster_cfg.get('min_area', 50)   # 最小怪物面积（像素）
+        self.max_monster_area = monster_cfg.get('max_area', 15000)  # 最大怪物面积（像素）
     
     def detect(self, image: np.ndarray, detection_region: Optional[Tuple[int, int, int, int]] = None) -> List[dict]:
         """

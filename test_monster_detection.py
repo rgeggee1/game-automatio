@@ -4,8 +4,7 @@
 """
 import sys
 import os
-import ctypes
-from ctypes import wintypes
+import yaml
 import cv2
 import numpy as np
 
@@ -13,6 +12,13 @@ import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'game-automation'))
 
 from detection.monster_detector import MonsterDetector
+
+
+def load_config():
+    """加载配置文件"""
+    config_path = os.path.join(os.path.dirname(__file__), 'game-automation', 'config.yaml')
+    with open(config_path, 'r', encoding='utf-8') as f:
+        return yaml.safe_load(f)
 
 
 def test_with_printwindow_simulation():
@@ -72,8 +78,9 @@ def test_with_printwindow_simulation():
     print(f"   检测区域: x={detection_region[0]}, y={detection_region[1]}, w={detection_region[2]}, h={detection_region[3]}")
     print()
     
-    # 创建检测器
-    detector = MonsterDetector()
+    # 加载配置并创建检测器
+    config = load_config()
+    detector = MonsterDetector(config.get('detection', {}))
     
     # 执行检测
     monsters = detector.detect(image, detection_region)
